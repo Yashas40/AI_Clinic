@@ -580,6 +580,29 @@ document.addEventListener('DOMContentLoaded', () => {
     logToSystem('<span class="text-blue-500 font-bold">[System] AI Online. Click anywhere to begin.</span>');
 });
 
+// 3D Tilt Physics for Components
+document.addEventListener('DOMContentLoaded', () => {
+    const initTilt = () => {
+        const cards = document.querySelectorAll('.js-tilt');
+        cards.forEach(card => {
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                const rotateX = ((y - (rect.height / 2)) / (rect.height / 2)) * -10;
+                const rotateY = ((x - (rect.width / 2)) / (rect.width / 2)) * 10;
+                card.style.transform = `scale(1.05) translateY(-5px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+                card.style.zIndex = '50';
+            });
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = '';
+                card.style.zIndex = '';
+            });
+        });
+    };
+    setTimeout(initTilt, 100);
+});
+
 // Global Utility Functions
 window.copyBookingDetails = function() {
     const doctor = document.getElementById('card-doctor').textContent;

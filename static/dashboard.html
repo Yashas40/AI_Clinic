@@ -8,111 +8,34 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
     <style>
-        /* Final Polish for Airy Light Theme */
-        .glass-panel {
-            background: #FFFFFF;
-            border: 1px solid rgba(0, 0, 0, 0.03);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-        }
-
-        .active-link {
-            background: rgba(59, 130, 246, 0.05);
-            color: #3b82f6 !important;
-            border-bottom: 2px solid #3b82f6;
-        }
-
-        .slot-grid-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
-            gap: 0.75rem;
-        }
+        /* Essential inline overrides to ensure dark theme consistency */
+        body { background-color: var(--bg-dark); }
+        .text-slate-800, .text-slate-700, .text-gray-400 { color: var(--text-main) !important; }
+        .bg-white, .bg-slate-50, .bg-blue-50, .bg-[#f8fafc] { background: transparent !important; }
+        .border-slate-100, .border-blue-50, .border-e2e8f0 { border-color: var(--glass-border) !important; }
         
-        .slot-item {
-            padding: 0.75rem;
-            text-align: center;
-            border-radius: 1rem;
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
-            font-size: 0.75rem;
-            cursor: pointer;
-            transition: all 0.2s;
-            color: #475569;
-            font-weight: 600;
-        }
-        .slot-item:hover:not(.booked) {
-            background: #eff6ff;
-            border-color: #3b82f6;
-            color: #3b82f6;
-        }
-        .slot-item.selected {
-            background: #3b82f6 !important;
-            border-color: #3b82f6 !important;
-            color: white !important;
-        }
-        .slot-item.booked {
-            opacity: 0.3;
-            background: #f1f5f9;
-            cursor: not-allowed;
-            text-decoration: line-through;
-        }
-
-        /* Mic Toggle Styles */
-        .mic-toggle {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.25rem 0.5rem;
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
-            border-radius: 999px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .mic-toggle.muted {
-            background: #fef2f2;
-            border-color: #fecaca;
-        }
-        .mic-toggle.muted svg {
-            color: #ef4444;
-        }
-
-        .slot-item.booked {
-            opacity: 0.3;
-            background: #f1f5f9;
-            cursor: not-allowed;
-            text-decoration: line-through;
-        }
-
-        /* Nav Links */
-        .nav-link {
-            transition: all 0.3s;
-            position: relative;
-        }
-        .nav-link::after {
-            content: '';
-            position: absolute;
-            bottom: -2px;
-            left: 50%;
-            width: 0;
-            height: 2px;
-            background: #3b82f6;
-            transition: all 0.3s;
-            transform: translateX(-50%);
-        }
-        .nav-link:hover::after {
-            width: 100%;
-        }
+        /* Confirmation bloom fallback */
+        #booking-confirm-card:not(.opacity-0) #confirm-card-inner { transform: scale(1) translateY(0); opacity: 1; }
+        #confirm-card-inner { transform: scale(0.8) translateY(20px); opacity: 0; transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
     </style>
 </head>
-<body class="flex flex-col">
+<body class="flex flex-col relative">
+
+    <!-- FLOATING MAP WIDGET -->
+    <a href="maps.html" class="map-widget-link fixed top-[5.5rem] right-8 w-56 h-28 rounded-2xl flex items-center justify-center font-bold overflow-hidden z-[40] group">
+        <div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1524661135-423995f22d0b?auto=format&fit=crop&w=400&q=80')] bg-cover bg-center opacity-30 group-hover:opacity-50 transition-all duration-500 group-hover:scale-110"></div>
+        <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
+        <div class="relative z-10 text-white flex flex-col items-center gap-1 shadow-black">
+            <svg class="w-6 h-6 text-blue-400 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A2 2 0 013 15.483V6.517a2 2 0 011.553-1.944L9 3M9 20l6-3m-6 3V3m6 14l5.447 2.724A2 2 0 0021 17.724V8.776a2 2 0 00-1.553-1.944L15 3m0 14V3"></path></svg>
+            <span class="text-xs tracking-widest uppercase">Launch Maps</span>
+        </div>
+    </a>
 
     <!-- TOP NAVIGATION -->
-    <nav class="h-20 glass-panel mx-4 mt-4 flex items-center justify-between px-8 z-50">
+    <nav class="h-20 glass-panel mx-4 mt-4 flex items-center justify-between px-8 z-50 rounded-2xl">
         <div class="flex items-center gap-4">
-            <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center shadow-[0_0_15px_rgba(59,130,246,0.5)]">
-                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path>
-                </svg>
+            <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center shadow-[0_0_15px_rgba(59,130,246,0.5)] border border-blue-400">
+                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path></svg>
             </div>
             <h1 class="text-2xl font-bold tracking-tight">DecVoice <span class="text-blue-400">AI</span></h1>
         </div>
@@ -125,7 +48,7 @@
             <a href="javascript:void(0)" onclick="openProfileModal()" class="nav-link">Profile</a>
         </div>
 
-        <button class="flex items-center gap-2 bg-red-50 hover:bg-red-100 text-red-500 px-4 py-2 rounded-xl transition-all border border-red-100 font-bold text-xs">
+        <button class="flex items-center gap-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 px-4 py-2 rounded-xl border border-red-500/20 transition-all font-bold text-xs backdrop-blur-md">
             <span>Log out</span>
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
         </button>
@@ -136,43 +59,47 @@
         
         <!-- LEFT COLUMN: AI & LOG -->
         <aside class="col-span-12 lg:col-span-3 flex flex-col gap-6 lg:h-[calc(100vh-120px)]">
-            <div class="glass-panel p-6 flex-1 flex flex-col overflow-hidden relative min-h-[500px]">
+            <div class="glass-panel p-6 flex-1 flex flex-col rounded-3xl overflow-hidden relative min-h-[500px]">
+                
                 <!-- AI PORTRAIT AREA -->
-                <div class="relative w-full aspect-square rounded-2xl overflow-hidden mb-6 group border border-blue-500/10 bg-white">
-                    <img src="img/emma.png" 
-                         id="emma-avatar" 
-                         class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
-                         alt="Emma"
-                         onerror="this.src='https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=800'">
-                    
-                    <!-- Magical Glowing Ball -->
-                    <div id="ai-core-ball" class="magical-ball top-4 right-4 listening"></div>
+                <div class="flex justify-center mb-8 mt-2 relative">
+                    <div class="relative w-48 h-48 avatar-container group">
+                        <div class="avatar-ring"></div>
+                        <img src="img/emma.png" 
+                             id="emma-avatar" 
+                             class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 rounded-full" 
+                             alt="Emma"
+                             onerror="this.src='https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=800'">
+                        
+                        <!-- Magical Glowing Ball -->
+                        <div id="ai-core-ball" class="magical-ball top-[-10px] right-[-10px]"></div>
 
-                    <!-- Code Energy Overlay -->
-                    <div id="code-energy" class="absolute inset-0 pointer-events-none"></div>
+                        <!-- Code Energy Overlay -->
+                        <div id="code-energy" class="absolute inset-0 pointer-events-none rounded-full overflow-hidden"></div>
 
-                    <!-- Speaking Visualization -->
-                    <div id="ai-wave" class="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-end gap-1 h-6 opacity-0 transition-opacity">
-                        <div class="w-1 bg-blue-400 animate-pulse h-2"></div>
-                        <div class="w-1 bg-blue-400 animate-pulse h-4" style="animation-delay: 0.1s"></div>
-                        <div class="w-1 bg-blue-400 animate-pulse h-6" style="animation-delay: 0.2s"></div>
-                        <div class="w-1 bg-blue-400 animate-pulse h-3" style="animation-delay: 0.3s"></div>
+                        <!-- Speaking Visualization -->
+                        <div id="ai-wave" class="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-end gap-1 h-6 opacity-0 transition-opacity">
+                            <div class="wave-bar animate-pulse h-2"></div>
+                            <div class="wave-bar animate-pulse h-4" style="animation-delay: 0.1s"></div>
+                            <div class="wave-bar animate-pulse h-6" style="animation-delay: 0.2s"></div>
+                            <div class="wave-bar animate-pulse h-3" style="animation-delay: 0.3s"></div>
+                        </div>
                     </div>
                 </div>
 
                 <div class="flex items-center justify-between mb-4 px-1">
                     <div class="flex items-center gap-3">
-                        <div id="status-dot" class="w-3 h-3 rounded-full bg-blue-500 animate-pulse shadow-[0_0_12px_rgba(59,130,246,0.4)]"></div>
-                        <span id="ai-status-text" class="text-[10px] uppercase tracking-widest text-blue-600 font-black">AI Listening...</span>
+                        <div id="status-dot" class="w-3 h-3 rounded-full bg-slate-500"></div>
+                        <span id="ai-status-text" class="text-[10px] uppercase tracking-widest text-[#94A3B8] font-black">AI Standby</span>
                     </div>
                     
                     <div class="flex items-center gap-2">
                         <!-- Compact Mic Toggle -->
-                        <button id="mic-toggle-btn" class="mic-toggle group" title="Toggle Microphone">
+                        <button id="mic-toggle-btn" class="mic-toggle group rounded-full p-2" title="Toggle Microphone">
                             <svg id="mic-icon" class="w-4 h-4 text-slate-400 group-hover:text-blue-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path>
                             </svg>
-                            <span id="mic-status-label" class="text-[9px] font-black uppercase tracking-tighter text-slate-400 group-hover:text-blue-500">ON</span>
+                            <span id="mic-status-label" class="text-[9px] font-black uppercase tracking-tighter text-slate-400 group-hover:text-blue-500">OFF</span>
                         </button>
                     </div>
                 </div>
@@ -186,230 +113,207 @@
 
                 <!-- SYSTEM LOG -->
                 <div class="flex-1 flex flex-col min-h-0">
-                    <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3 px-2">System Log</h3>
-                    <div id="system-log" class="flex-1 overflow-y-auto custom-scrollbar bg-white/40 rounded-xl p-4 font-mono text-xs space-y-2 text-slate-600">
-                        <div class="text-blue-500 font-bold">[System v2.0] AI Core Online.</div>
-                        <div>Microphone ready.</div>
-                        <div>Speech synthetic loaded.</div>
-                        <div class="text-blue-600 border border-blue-200 bg-white/60 p-2 rounded shadow-sm">➜ Click <span class="font-bold underline">ANYWHERE</span> to wake up the AI.</div>
+                    <h3 class="text-xs font-bold text-blue-400 opacity-80 uppercase tracking-wider mb-2 px-2">Terminal</h3>
+                    <div id="system-log" class="flex-1 overflow-y-auto custom-scrollbar rounded-xl p-4 font-mono text-xs space-y-2">
+                        <div class="log-item text-blue-400 font-bold">[System v3.0] AI Spatial Core Online.</div>
+                        <div class="log-item">Microphone ready.</div>
+                        <div class="log-item">Neural pathways initialized.</div>
+                        <div class="log-item text-violet-400 border border-violet-500/20 bg-violet-500/10 p-2 rounded shadow-sm">➜ Click <span class="font-bold underline">ANYWHERE</span> to activate the matrix.</div>
                     </div>
                 </div>
             </div>
         </aside>
 
         <!-- CENTER COLUMN: SPECIALIST GRID -->
-        <section class="col-span-12 lg:col-span-6 flex flex-col gap-6 lg:h-[calc(100vh-120px)]">
-            <div class="flex items-center justify-between">
-                <h2 class="text-2xl font-bold flex items-center gap-3 text-slate-800">
+        <section class="col-span-12 lg:col-span-6 flex flex-col gap-6 lg:h-[calc(100vh-120px)] relative">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-3xl font-bold flex items-center gap-3">
                     Available Specialists
-                    <span class="text-[10px] bg-slate-200 text-slate-500 px-3 py-1 rounded-full uppercase tracking-widest font-bold">Live System</span>
+                    <span class="text-[10px] bg-blue-500/20 border border-blue-500/30 text-blue-400 px-3 py-1 rounded-full uppercase tracking-widest font-bold">Live Feed</span>
                 </h2>
-                <a href="maps.html" class="flex items-center gap-2 bg-blue-50 hover:bg-blue-100 text-blue-600 px-4 py-2 rounded-xl border border-blue-100 transition-all font-bold text-xs">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A2 2 0 013 15.483V6.517a2 2 0 011.553-1.944L9 3M9 20l6-3m-6 3V3m6 14l5.447 2.724A2 2 0 0021 17.724V8.776a2 2 0 00-1.553-1.944L15 3m0 14V3"></path></svg>
-                    View Maps
-                </a>
+                <!-- View Maps moved to absolute top right widget -->
             </div>
 
-            <!-- SCROLLABLE GRID -->
-            <div class="flex-1 overflow-y-auto pr-2 custom-scrollbar">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pb-4" id="specialist-grid">
+            <!-- 3D SCROLLABLE GRID -->
+            <div class="flex-1 overflow-visible custom-scrollbar">
+                <div id="specialist-grid">
                     <!-- Dr. Sharma -->
-                    <div class="specialist-card p-5 cursor-pointer relative group transition-all" onclick="handleDoctorSelect('Dr. Sharma')">
-                        <div class="flex gap-5">
-                            <div class="w-16 h-16 rounded-2xl overflow-hidden shadow-md shrink-0 border border-slate-100 group-hover:scale-105 transition-transform">
-                                <img src="https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?auto=format&fit=crop&q=80&w=200&h=200" class="w-full h-full object-cover">
+                    <div class="specialist-card js-tilt p-5 cursor-pointer flex gap-5 items-center" onclick="handleDoctorSelect('Dr. Sharma')">
+                        <div class="w-16 h-16 rounded-2xl overflow-hidden shadow-black/40 shadow-lg shrink-0 border border-white/10">
+                            <img src="https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?auto=format&fit=crop&q=80&w=200&h=200" class="w-full h-full object-cover">
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-2 mb-0.5">
+                                <h4 class="font-bold text-lg truncate text-white">Dr. Sharma</h4>
+                                <span class="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_10px_#34d399]"></span>
                             </div>
-                            <div class="flex-1 min-w-0">
-                                <div class="flex items-center gap-2 mb-0.5">
-                                    <h4 class="font-bold text-slate-800 truncate">Dr. Sharma</h4>
-                                    <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-                                </div>
-                                <p class="text-blue-500 text-[10px] font-black uppercase tracking-widest mb-1 leading-none">Orthopedics</p>
-                                <p class="text-[10px] text-slate-400 leading-tight">Expert in bone injuries and chronic back pain.</p>
-                            </div>
+                            <p class="text-blue-400 text-[10px] font-black uppercase tracking-widest mb-1 leading-none">Orthopedics</p>
+                            <p class="text-[10px] text-slate-300 leading-tight">Expert in bone injuries and chronic back pain.</p>
                         </div>
                     </div>
 
                     <!-- Dr. Gupta -->
-                    <div class="specialist-card p-5 cursor-pointer relative group transition-all" onclick="handleDoctorSelect('Dr. Gupta')">
-                        <div class="flex gap-5">
-                            <div class="w-16 h-16 rounded-2xl overflow-hidden shadow-md shrink-0 border border-slate-100 group-hover:scale-105 transition-transform">
-                                <img src="https://images.unsplash.com/photo-1537368910025-700350fe46c7?auto=format&fit=crop&q=80&w=200&h=200" class="w-full h-full object-cover">
+                    <div class="specialist-card js-tilt p-5 cursor-pointer flex gap-5 items-center" onclick="handleDoctorSelect('Dr. Gupta')">
+                        <div class="w-16 h-16 rounded-2xl overflow-hidden shadow-black/40 shadow-lg shrink-0 border border-white/10">
+                            <img src="https://images.unsplash.com/photo-1537368910025-700350fe46c7?auto=format&fit=crop&q=80&w=200&h=200" class="w-full h-full object-cover">
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-2 mb-0.5">
+                                <h4 class="font-bold text-lg truncate text-white">Dr. Gupta</h4>
+                                <span class="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_10px_#34d399]"></span>
                             </div>
-                            <div class="flex-1 min-w-0">
-                                <div class="flex items-center gap-2 mb-0.5">
-                                    <h4 class="font-bold text-slate-800 truncate">Dr. Gupta</h4>
-                                    <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-                                </div>
-                                <p class="text-blue-500 text-[10px] font-black uppercase tracking-widest mb-1 leading-none">Cardiology</p>
-                                <p class="text-[10px] text-slate-400 leading-tight">Renowned heart specialist and vascular expert.</p>
-                            </div>
+                            <p class="text-blue-400 text-[10px] font-black uppercase tracking-widest mb-1 leading-none">Cardiology</p>
+                            <p class="text-[10px] text-slate-300 leading-tight">Renowned heart specialist and vascular expert.</p>
                         </div>
                     </div>
 
                     <!-- Dr. Reddy -->
-                    <div class="specialist-card p-5 cursor-pointer relative group transition-all" onclick="handleDoctorSelect('Dr. Arjun Reddy')">
-                        <div class="flex gap-5">
-                            <div class="w-16 h-16 rounded-2xl overflow-hidden shadow-md shrink-0 border border-slate-100 group-hover:scale-105 transition-transform">
-                                <img src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&q=80&w=200&h=200" class="w-full h-full object-cover">
+                    <div class="specialist-card js-tilt p-5 cursor-pointer flex gap-5 items-center" onclick="handleDoctorSelect('Dr. Arjun Reddy')">
+                        <div class="w-16 h-16 rounded-2xl overflow-hidden shadow-black/40 shadow-lg shrink-0 border border-white/10">
+                            <img src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&q=80&w=200&h=200" class="w-full h-full object-cover">
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-2 mb-0.5">
+                                <h4 class="font-bold text-lg truncate text-white">Dr. Reddy</h4>
+                                <span class="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_10px_#34d399]"></span>
                             </div>
-                            <div class="flex-1 min-w-0">
-                                <div class="flex items-center gap-2 mb-0.5">
-                                    <h4 class="font-bold text-slate-800 truncate">Dr. Reddy</h4>
-                                    <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-                                </div>
-                                <p class="text-blue-500 text-[10px] font-black uppercase tracking-widest mb-1 leading-none">Pediatrics</p>
-                                <p class="text-[10px] text-slate-400 leading-tight">Compassionate care for infants and children.</p>
-                            </div>
+                            <p class="text-blue-400 text-[10px] font-black uppercase tracking-widest mb-1 leading-none">Pediatrics</p>
+                            <p class="text-[10px] text-slate-300 leading-tight">Compassionate care for infants and children.</p>
                         </div>
                     </div>
 
                     <!-- Dr. Jawali -->
-                    <div class="specialist-card p-5 cursor-pointer relative group transition-all" onclick="handleDoctorSelect('Dr. Vivek Jawali')">
-                        <div class="flex gap-5">
-                            <div class="w-16 h-16 rounded-2xl overflow-hidden shadow-md shrink-0 border border-slate-100 group-hover:scale-105 transition-transform">
-                                <img src="https://images.unsplash.com/photo-1622253692010-333f2da6031d?auto=format&fit=crop&q=80&w=200&h=200" class="w-full h-full object-cover">
+                    <div class="specialist-card js-tilt p-5 cursor-pointer flex gap-5 items-center" onclick="handleDoctorSelect('Dr. Vivek Jawali')">
+                        <div class="w-16 h-16 rounded-2xl overflow-hidden shadow-black/40 shadow-lg shrink-0 border border-white/10">
+                            <img src="https://images.unsplash.com/photo-1622253692010-333f2da6031d?auto=format&fit=crop&q=80&w=200&h=200" class="w-full h-full object-cover">
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-2 mb-0.5">
+                                <h4 class="font-bold text-lg truncate text-white">Dr. Vivek Jawali</h4>
+                                <span class="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_10px_#34d399]"></span>
                             </div>
-                            <div class="flex-1 min-w-0">
-                                <div class="flex items-center gap-2 mb-0.5">
-                                    <h4 class="font-bold text-slate-800 truncate">Dr. Vivek Jawali</h4>
-                                    <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-                                </div>
-                                <p class="text-blue-500 text-[10px] font-black uppercase tracking-widest mb-1 leading-none">Cardiac Surgery</p>
-                                <p class="text-[10px] text-slate-400 leading-tight">World pioneer in bypass and valve surgery.</p>
-                            </div>
+                            <p class="text-blue-400 text-[10px] font-black uppercase tracking-widest mb-1 leading-none">Cardiac Surgery</p>
+                            <p class="text-[10px] text-slate-300 leading-tight">World pioneer in bypass and valve surgery.</p>
                         </div>
                     </div>
 
                     <!-- Dr. Raut -->
-                    <div class="specialist-card p-5 cursor-pointer relative group transition-all" onclick="handleDoctorSelect('Dr. Akshay Raut')">
-                        <div class="flex gap-5">
-                            <div class="w-16 h-16 rounded-2xl overflow-hidden shadow-md shrink-0 border border-slate-100 group-hover:scale-105 transition-transform">
-                                <img src="https://images.unsplash.com/photo-1594824476967-48c8b964273f?auto=format&fit=crop&q=80&w=200&h=200" class="w-full h-full object-cover">
+                    <div class="specialist-card js-tilt p-5 cursor-pointer flex gap-5 items-center" onclick="handleDoctorSelect('Dr. Akshay Raut')">
+                        <div class="w-16 h-16 rounded-2xl overflow-hidden shadow-black/40 shadow-lg shrink-0 border border-white/10">
+                            <img src="https://images.unsplash.com/photo-1594824476967-48c8b964273f?auto=format&fit=crop&q=80&w=200&h=200" class="w-full h-full object-cover">
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-2 mb-0.5">
+                                <h4 class="font-bold text-lg truncate text-white">Dr. Raut</h4>
+                                <span class="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_10px_#34d399]"></span>
                             </div>
-                            <div class="flex-1 min-w-0">
-                                <div class="flex items-center gap-2 mb-0.5">
-                                    <h4 class="font-bold text-slate-800 truncate">Dr. Raut</h4>
-                                    <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-                                </div>
-                                <p class="text-blue-500 text-[10px] font-black uppercase tracking-widest mb-1 leading-none">Sports Medicine</p>
-                                <p class="text-[10px] text-slate-400 leading-tight">Specialist in athletic injuries and recovery.</p>
-                            </div>
+                            <p class="text-blue-400 text-[10px] font-black uppercase tracking-widest mb-1 leading-none">Sports Medicine</p>
+                            <p class="text-[10px] text-slate-300 leading-tight">Specialist in athletic injuries and recovery.</p>
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- Bottom Summary Card -->
-            <div class="bg-white rounded-[2rem] p-5 flex items-center justify-between border border-slate-100 shadow-sm mb-4">
+            <div class="glass-panel rounded-[2rem] p-5 flex items-center justify-between mt-auto mx-4 z-10 mb-4 bg-black/40 backdrop-blur-3xl">
                 <div class="flex items-center gap-4">
-                    <div class="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center text-blue-500">
+                    <div class="w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400 border border-blue-500/30">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
                     </div>
                     <div>
-                        <p class="text-xs font-bold text-slate-700">Appointments Overview</p>
-                        <p id="pending-summary" class="text-[10px] text-slate-400">Checking your schedule...</p>
+                        <p class="text-sm font-bold text-white">Appointments Overview</p>
+                        <p id="pending-summary" class="text-[10px] text-blue-300 tracking-wide uppercase">Checking matrix data...</p>
                     </div>
                 </div>
-                <div class="flex items-center gap-3">
-                    <label class="relative inline-flex items-center cursor-pointer">
-                        <input type="checkbox" value="" class="sr-only peer">
-                        <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                    </label>
-                    <div class="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-[10px] text-white font-bold">➜</div>
-                </div>
+                <!-- Mini toggler replaced by simple glowing indicator -->
+                <div class="w-8 h-8 rounded-full bg-blue-600 shadow-[0_0_15px_#2563eb] flex items-center justify-center text-[10px] text-white font-bold cursor-pointer hover:bg-blue-500">➜</div>
             </div>
         </section>
 
         <!-- RIGHT COLUMN: DYNAMIC BOOKING PANEL -->
         <aside class="col-span-12 lg:col-span-3 lg:h-[calc(100vh-120px)] flex flex-col gap-6">
-            <div class="glass-panel p-6 flex-1 flex flex-col min-h-0 min-h-[500px]">
-                <h3 class="text-lg font-bold mb-4 flex items-center gap-2">
+            <div class="glass-panel p-6 flex-1 flex flex-col min-h-[500px] rounded-[2rem] border-blue-500/10">
+                <h3 class="text-xl font-bold mb-6 flex items-center gap-2 text-white">
                     <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                    Book Slot
+                    Secure Node
                 </h3>
 
-                <!-- CALENDAR GRID -->
-                <div class="bg-blue-50/50 border border-blue-100 rounded-2xl p-4 mb-6">
-                    <div class="flex items-center justify-between mb-4">
-                        <button id="prev-month" class="text-slate-400 hover:text-blue-500"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg></button>
-                        <h4 id="calendar-date-display" class="text-sm font-bold truncate px-2 text-slate-700">March 2026</h4>
-                        <button id="next-month" class="text-slate-400 hover:text-blue-500"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></button>
+                <!-- CALENDAR GRID (Now pill slider) -->
+                <div class="bg-black/20 border border-white/5 rounded-2xl p-4 mb-6 relative overflow-hidden">
+                    <div class="absolute inset-0 bg-blue-500/5 backdrop-blur-[2px] pointer-events-none"></div>
+                    <div class="flex items-center justify-between mb-4 relative z-10 w-full px-2">
+                        <button id="prev-month" class="text-slate-400 hover:text-white"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg></button>
+                        <h4 id="calendar-date-display" class="text-sm font-bold truncate text-blue-200 tracking-widest uppercase">March 2026</h4>
+                        <button id="next-month" class="text-slate-400 hover:text-white"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></button>
                     </div>
-                    <div class="grid grid-cols-7 gap-1 text-center text-[10px] text-slate-400 font-bold mb-2">
-                        <div>Su</div><div>Mo</div><div>Tu</div><div>We</div><div>Th</div><div>Fr</div><div>Sa</div>
-                    </div>
-                    <div id="calendar-grid" class="grid grid-cols-7 gap-1 text-center font-bold">
+                    <!-- The Grid is now a horizontal wrapper thanks to Style.css overriding calendar-day -->
+                    <div id="calendar-grid" class="calendar-wrap custom-scrollbar relative z-10">
                         <!-- Days injected by JS -->
                     </div>
                 </div>
 
                 <!-- SELECTED DOCTOR PREVIEW -->
-                <div class="flex items-center gap-4 bg-white border border-blue-100 p-3 rounded-2xl mb-6 shadow-sm">
-                    <img id="booking-doctor-img" src="https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?auto=format&fit=crop&q=80&w=200&h=200" class="w-12 h-14 object-cover rounded-lg border border-blue-50">
+                <div class="flex items-center gap-4 bg-black/20 border border-white/5 p-3 rounded-2xl mb-6 shadow-sm">
+                    <img id="booking-doctor-img" src="https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?auto=format&fit=crop&q=80&w=200&h=200" class="w-14 h-14 object-cover rounded-xl border border-white/10 shadow-black shadow-inner">
                     <div>
-                        <p class="text-[10px] text-slate-400 uppercase font-bold tracking-widest">Selected Specialist</p>
-                        <h4 id="calendar-doctor-name" class="font-bold text-blue-600">Dr. Sharma</h4>
+                        <p class="text-[9px] text-blue-300 uppercase font-black tracking-widest">Locked Target</p>
+                        <h4 id="calendar-doctor-name" class="font-bold text-white text-lg">Dr. Sharma</h4>
                     </div>
                 </div>
 
                 <!-- GRANULAR TIME SLOTS -->
                 <div class="flex-1 overflow-hidden flex flex-col">
-                    <p class="text-xs font-bold text-gray-400 mb-3 px-1">Available Times (15m intervals)</p>
-                    <div id="slot-grid" class="flex-1 overflow-y-auto custom-scrollbar slot-grid-container pr-2 pb-4">
-                        <!-- Slots generated by JS (9 AM - 4 PM) -->
+                    <p class="text-xs font-bold text-blue-400/80 mb-3 px-1 tracking-widest uppercase">Temporal Grid</p>
+                    <div id="slot-grid" class="flex-1 overflow-y-auto custom-scrollbar slot-grid-container pr-2 pb-4 pt-1">
+                        <!-- Slots generated by JS -->
                     </div>
                 </div>
 
-                <button id="book-slot-btn" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-2xl transition-all shadow-lg active:scale-95 mt-4">
-                    Book Slot
+                <button id="book-slot-btn" class="w-full text-white font-black uppercase tracking-widest py-4 rounded-2xl transition-all shadow-lg active:scale-95 mt-4 text-sm">
+                    Confirm Link
                 </button>
             </div>
         </aside>
     </main>
 
     <!-- CONFIRMATION MODAL (GLASSY) -->
-    <div id="booking-confirm-card" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-md opacity-0 pointer-events-none transition-all duration-500">
-        <div id="confirm-card-inner" class="glass-panel p-8 max-w-sm w-full border border-blue-500/30 shadow-[0_0_50px_rgba(59,130,246,0.2)] transform scale-90 transition-transform">
-            <div class="text-center">
-                <div class="w-16 h-16 bg-blue-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <svg class="w-8 h-8 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+    <div id="booking-confirm-card" class="fixed inset-0 z-[200] flex items-center justify-center bg-black/40 backdrop-blur-[24px] opacity-0 pointer-events-none transition-all duration-700">
+        <div id="confirm-card-inner" class="glass-panel p-8 max-w-sm w-full border border-blue-500/50 shadow-[0_0_100px_rgba(59,130,246,0.3)] rounded-3xl relative overflow-hidden bg-black/60">
+            <div class="absolute inset-0 bg-blue-500/10 backdrop-blur-[200px]"></div>
+            <div class="text-center relative z-10">
+                <div class="w-20 h-20 bg-blue-500/20 rounded-full flex items-center justify-center mx-auto mb-4 border border-blue-400/50 shadow-[0_0_30px_rgba(59,130,246,0.5)]">
+                    <svg class="w-10 h-10 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
                 </div>
-                <h2 class="text-2xl font-bold mb-1">Appointment Confirmed!</h2>
-                <p class="text-xs text-blue-400 uppercase tracking-widest font-bold mb-6">Node Secured</p>
+                <h2 class="text-3xl font-black mb-1 text-white tracking-tight">Access Granted</h2>
+                <p class="text-xs text-blue-400 uppercase tracking-[0.3em] font-black mb-8">Node Secured</p>
                 
-                <div class="space-y-4 text-left bg-black/20 p-4 rounded-2xl mb-6">
+                <div class="space-y-4 text-left bg-black/40 border border-white/10 p-5 rounded-2xl mb-8">
                     <div class="flex justify-between border-b border-white/5 pb-2">
-                        <span class="text-xs text-gray-500">Doctor</span>
-                        <span id="card-doctor" class="text-xs font-bold">Dr. Sharma</span>
+                        <span class="text-xs text-slate-400 tracking-wider">SPECIALIST</span>
+                        <span id="card-doctor" class="text-xs font-bold text-white uppercase">Dr. Sharma</span>
                     </div>
                     <div class="flex justify-between border-b border-white/5 pb-2">
-                        <span class="text-xs text-gray-500">Date</span>
-                        <span id="card-date" class="text-xs font-bold">2026-03-15</span>
+                        <span class="text-xs text-slate-400 tracking-wider">DATE</span>
+                        <span id="card-date" class="text-xs font-bold text-white uppercase">2026-03-15</span>
                     </div>
                     <div class="flex justify-between border-b border-white/5 pb-2">
-                        <span class="text-xs text-gray-500">Time</span>
-                        <span id="card-time" class="text-xs font-bold">09:00 AM</span>
+                        <span class="text-xs text-slate-400 tracking-wider">TIME</span>
+                        <span id="card-time" class="text-xs font-bold text-white uppercase">09:00 AM</span>
                     </div>
                     <div class="flex justify-between border-b border-white/5 pb-2">
-                        <span class="text-xs text-gray-500">Patient</span>
-                        <span id="card-patient" class="text-xs font-bold">Emma (Demo)</span>
+                        <span class="text-xs text-slate-400 tracking-wider">ENTITY</span>
+                        <span id="card-patient" class="text-xs font-bold text-white uppercase">Emma (Demo)</span>
                     </div>
-                    <div class="flex justify-between">
-                        <span class="text-xs text-gray-500">Token</span>
+                    <div class="flex justify-between items-center pt-2">
+                        <span class="text-xs text-slate-400 tracking-wider">TOKEN</span>
                         <div class="flex items-center gap-2">
-                            <span id="card-token" class="text-xs font-bold text-blue-400">---</span>
-                            <button onclick="copyBookingDetails()" class="text-[10px] text-blue-500 hover:text-blue-400 font-bold uppercase tracking-tighter">Copy</button>
+                            <span id="card-token" class="text-sm font-black text-blue-400 tracking-widest font-mono">---</span>
+                            <button onclick="copyBookingDetails()" class="text-[9px] bg-blue-500/20 text-blue-300 hover:text-white hover:bg-blue-500 px-2 py-1 rounded font-bold uppercase tracking-widest">Copy</button>
                         </div>
                     </div>
                 </div>
 
-                <div class="flex items-center gap-2 justify-center mb-6">
-                    <div id="email-status-dot" class="w-2 h-2 rounded-full bg-blue-400 animate-pulse"></div>
-                    <span id="email-status-text" class="text-[10px] text-gray-400">Communicating with patient...</span>
-                </div>
-
-                <button onclick="document.getElementById('booking-confirm-card').classList.add('opacity-0', 'pointer-events-none');" class="w-full py-3 bg-gray-700 hover:bg-gray-600 rounded-xl font-bold transition-all">Dismiss</button>
+                <button onclick="document.getElementById('booking-confirm-card').classList.add('opacity-0', 'pointer-events-none');" class="w-full py-4 glass-panel border border-white/10 hover:bg-white/10 rounded-2xl font-bold uppercase tracking-widest text-xs transition-all">Close Instance</button>
             </div>
         </div>
     </div>
@@ -426,29 +330,40 @@
 
     <script src="js/app.js"></script>
     <script>
-        // Generate Code Energy Particles
+        // Generate Code Energy Particles updated for dark theme
         const energyContainer = document.getElementById('code-energy');
-        const codeChars = "01<>{}[]/\\|;:+=-_!@#$%^&*()";
+        const codeChars = "01/";
         
         function createParticle() {
+            if (!energyContainer) return;
             const particle = document.createElement('div');
             particle.className = 'energy-particle';
-            particle.style.position = 'absolute'; // Prevent stacking in a line
+            particle.style.position = 'absolute';
+            particle.style.color = 'rgba(59, 130, 246, 0.4)';
+            particle.style.fontSize = '8px';
+            particle.style.fontWeight = 'bold';
+            particle.style.pointerEvents = 'none';
             particle.textContent = codeChars[Math.floor(Math.random() * codeChars.length)];
             particle.style.left = Math.random() * 100 + "%";
             particle.style.bottom = "0%";
-            particle.style.animationDuration = (Math.random() * 2 + 2) + "s";
+            particle.style.transition = "transform 4s linear, opacity 1s";
+            
             energyContainer.appendChild(particle);
-            setTimeout(() => particle.remove(), 4000);
+            
+            // simple animate up
+            requestAnimationFrame(() => {
+                particle.style.transform = `translateY(-200px)`;
+                particle.style.opacity = '0';
+            });
+
+            setTimeout(() => particle.remove(), 3500);
         }
-        setInterval(createParticle, 100);
+        setInterval(createParticle, 200);
 
         function selectDoctor(name) {
             document.querySelectorAll('.specialist-card').forEach(c => c.classList.remove('selected'));
             const card = Array.from(document.querySelectorAll('.specialist-card')).find(c => c.innerText.includes(name));
             if (card) card.classList.add('selected');
-            
-            // Trigger the actual app.js logic
             if (window.handleDoctorSelect) window.handleDoctorSelect(name);
         }
     </script>
