@@ -1,0 +1,6 @@
+venv/
+__pycache__/
+*.pyc
+clinic.db
+gemin_out.txt
+.env

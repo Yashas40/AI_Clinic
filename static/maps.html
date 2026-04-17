@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DocVoice AI - Live Map Uplink</title>
+    
+    <!-- Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="css/style.css">
+    
+    <style>
+        body { font-family: 'Montserrat', sans-serif; }
+    </style>
+</head>
+<body class="bg-[#F5F3EC] h-screen w-screen overflow-hidden relative text-slate-800">
+    
+    <!-- Global Navigation Bar -->
+    <nav class="absolute top-0 w-full bg-white border-b border-slate-100 px-8 py-4 flex justify-between items-center z-[200] shadow-sm">
+        <div class="flex items-center gap-3">
+            <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
+            <span class="text-xl font-bold text-slate-800 tracking-wide">DocVoice<span class="text-blue-600">AI</span></span>
+        </div>
+        <div class="flex gap-6 pointer-events-auto">
+            <a href="dashboard.html" class="text-slate-400 hover:text-blue-600 font-bold pb-1 transition-colors tracking-wide">Doctors</a>
+            <a href="maps.html" class="text-blue-600 font-bold border-b-2 border-blue-600 pb-1 transition-colors tracking-wide">View Maps</a>
+        </div>
+        <div class="pointer-events-auto">
+            <a href="index.html" class="text-sm text-red-500 border border-red-100 hover:bg-red-50 px-4 py-2 rounded-xl font-bold transition-all">Logout</a>
+        </div>
+    </nav>
+
+    <!-- Fullscreen Map Container -->
+    <div id="map" class="absolute inset-x-0 bottom-0 top-[76px] z-0 bg-[#F5F3EC]"></div>
+
+    <!-- Map UI Overlay Layer text overlay -->
+    <div class="absolute inset-x-0 bottom-0 top-[76px] z-10 pointer-events-none p-6 flex flex-col justify-between">
+        
+        <!-- Top HUD Row -->
+        <div class="flex justify-between items-start w-full">
+            
+            <!-- Top Left: System Alert Panel -->
+            <div class="pointer-events-auto bg-white border border-slate-100 rounded-2xl p-6 w-80 shadow-lg">
+                <h2 class="text-blue-600 font-bold text-xs mb-2 tracking-widest uppercase flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-blue-600 animate-pulse"></span>
+                    Geographical Scout
+                </h2>
+                <p class="text-xs text-slate-500 mb-5 leading-relaxed">
+                    Locate medical infrastructure in your sector. Adjust coordinates to filter available nodes.
+                </p>
+                
+                <div class="space-y-4">
+                    <div class="relative">
+                        <select id="state-select" class="w-full bg-slate-50 border border-slate-200 text-slate-700 text-sm rounded-xl px-4 py-2.5 appearance-none focus:outline-none focus:border-blue-500 transition-colors font-semibold">
+                            <option value="">Select Sector (State)</option>
+                        </select>
+                    </div>
+                    <div class="relative">
+                        <select id="district-select" class="w-full bg-slate-50 border border-slate-200 text-slate-700 text-sm rounded-xl px-4 py-2.5 appearance-none focus:outline-none focus:border-blue-500 transition-colors font-semibold" disabled>
+                            <option value="">Select Grid (District)</option>
+                        </select>
+                    </div>
+                    <button id="scout-btn" class="w-full bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold py-3 rounded-xl transition-all tracking-wider shadow-md">
+                        Execute Scout
+                    </button>
+                </div>
+                
+                <div class="hidden opacity-0 h-0" id="calendar-date-display">Today</div>
+
+                <button class="w-full mt-5 bg-white border border-blue-200 hover:bg-blue-50 text-blue-600 text-xs font-bold py-3 rounded-xl transition-all flex items-center justify-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path></svg>
+                    INITIATE VOICE COMMAND
+                </button>
+            </div>
+
+            <!-- Top Right: Hospital Matches Panel -->
+            <div class="pointer-events-auto flex flex-col items-end gap-4">
+                <div class="bg-white border border-slate-100 rounded-2xl p-6 shadow-lg">
+                    <h2 class="text-slate-400 font-bold text-[10px] tracking-widest uppercase mb-4">Infrastructure Scan</h2>
+                    <div class="flex gap-8">
+                        <div class="text-center">
+                            <div class="text-3xl font-bold text-slate-800 mb-1" id="hospital-count">0</div>
+                            <div class="text-[10px] text-slate-400 tracking-widest uppercase font-bold">Nodes Found</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-3xl font-bold text-blue-600 mb-1" id="max-rating">4.8</div>
+                            <div class="text-[10px] text-slate-400 tracking-widest uppercase font-bold">Reliability</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Database Current Bookings Widget container -->
+                <div class="bg-white border border-slate-100 rounded-2xl p-4 w-64 shadow-lg overflow-hidden" id="db-widget">
+                    <h3 class="text-[10px] text-blue-600 font-bold uppercase tracking-widest border-b border-slate-50 pb-2 mb-3 flex justify-between">
+                        <span>Database Stream</span>
+                        <span class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse mt-0.5"></span>
+                    </h3>
+                    <div class="overflow-y-auto space-y-1.5 text-xs h-24 custom-scrollbar pr-1" id="db-status-list">
+                        <!-- Bookings populate here -->
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Bottom HUD Row -->
+        <div class="flex justify-center items-end relative w-full h-32">
+            
+            <!-- Bottom Left Logs -->
+            <div class="absolute left-0 bottom-0 pointer-events-auto bg-white border border-slate-100 rounded-2xl p-4 w-80 h-32 flex flex-col shadow-lg overflow-hidden">
+                <h3 class="text-[10px] text-slate-400 font-bold uppercase tracking-widest border-b border-slate-50 pb-2 mb-2 flex items-center gap-1.5">
+                    <svg class="w-3 h-3 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                    Terminal Subroutine
+                </h3>
+                <div id="system-log" class="space-y-1 overflow-y-auto flex-1 font-mono text-[10px] text-blue-600 custom-scrollbar pr-1 opacity-80"></div>
+            </div>
+
+            <!-- Central AI Orb Component -->
+            <div class="pointer-events-auto relative mt-4 flex flex-col items-center">
+                <div class="ai-pulse-container mb-2" id="mic-btn">
+                    <div class="ai-ring idle" id="ai-ring"></div>
+                    <div class="ai-core idle flex items-center justify-center bg-blue-600 shadow-xl border-4 border-white">
+                        <svg class="w-7 h-7 text-white relative z-20 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path></svg>
+                    </div>
+                </div>
+                <div class="bg-white px-5 py-2 rounded-full shadow-sm border border-slate-100 mt-3 flex items-center gap-2">
+                    <span class="w-3 h-3 rounded-full bg-slate-200"></span>
+                    <p id="ai-status-text" class="text-slate-800 font-bold text-[10px] tracking-widest uppercase">System Standby</p>
+                </div>
+                <!-- Language Selector -->
+                <div class="mt-4 flex gap-2">
+                    <select id="lang-select" class="pointer-events-auto bg-white border border-slate-100 text-slate-800 text-[10px] font-bold rounded-lg px-3 py-1.5 outline-none shadow-sm transition-all hover:border-blue-300">
+                        <option value="en-US">ENGLISH</option>
+                        <option value="kn-IN">KANNADA (ಕನ್ನಡ)</option>
+                        <option value="hi-IN">HINDI (हिन्दी)</option>
+                    </select>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+
+    <!-- AI Cursor (Magical Orb) -->
+    <div id="ai-cursor" class="fixed pointer-events-none z-[300] opacity-0 transition-opacity duration-300">
+        <div class="magical-orb"></div>
+    </div>
+
+    <!-- Ghost Click Popup -->
+    <div id="ghost-popup" class="fixed top-[20%] left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-gradient-to-r from-cyan-600 to-blue-800 text-white px-8 py-5 rounded-xl shadow-[0_0_30px_rgba(8,145,178,0.6)] z-[310] opacity-0 pointer-events-none scale-75 transition-all duration-500 border border-cyan-400">
+        <div class="flex flex-col items-center gap-2">
+            <svg class="w-10 h-10 text-cyan-200 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            <p class="font-bold text-lg text-center tracking-wide" id="popup-text">Node Secured</p>
+        </div>
+    </div>
+
+    <!-- Hidden HTML Template for Leaflet Popups -->
+    <template id="booking-popup-template">
+        <div class="w-64 bg-gray-900 border border-cyan-800/80 text-gray-200 p-3 rounded-xl shadow-lg shadow-black/80 font-sans pointer-events-auto leaflet-override-bg">
+            <h4 class="font-bold text-cyan-400 text-base mb-1 truncate hospital-name flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-cyan-400 mb-0.5"></span>
+                Hospital Name
+            </h4>
+            <div class="h-px w-full bg-gradient-to-r from-cyan-800 to-transparent my-2"></div>
+            
+            <p class="text-xs text-gray-400 mb-2 truncate hospital-specialty capitalize">General Medical</p>
+            <p class="text-xs text-gray-500 mb-3 hospital-date">Selected Date: <span class="text-cyan-300 popup-date-val">Today</span></p>
+
+            <div class="grid grid-cols-2 gap-2 slots-container">
+                <button class="slot-btn map-slot py-1.5 bg-gray-800 hover:bg-gray-700 hover:border-cyan-500 hover:text-cyan-300 border border-gray-600 rounded-md text-xs font-bold transition-all shadow-inner" data-time="9:00 AM">9:00 AM</button>
+                <button class="slot-btn map-slot py-1.5 bg-gray-800 hover:bg-gray-700 hover:border-cyan-500 hover:text-cyan-300 border border-gray-600 rounded-md text-xs font-bold transition-all shadow-inner" data-time="10:30 AM">10:30 AM</button>
+                <button class="slot-btn map-slot py-1.5 bg-gray-800 hover:bg-gray-700 hover:border-cyan-500 hover:text-cyan-300 border border-gray-600 rounded-md text-xs font-bold transition-all shadow-inner" data-time="12:00 PM">12:00 PM</button>
+                <button class="slot-btn map-slot py-1.5 bg-gray-800 hover:bg-gray-700 hover:border-cyan-500 hover:text-cyan-300 border border-gray-600 rounded-md text-xs font-bold transition-all shadow-inner" data-time="2:00 PM">2:00 PM</button>
+            </div>
+        </div>
+    </template>
+
+    <!-- Booking Confirmation Card Overlay -->
+    <div id="booking-confirm-card" class="fixed inset-0 z-[500] flex items-center justify-center pointer-events-none opacity-0 transition-all duration-500">
+        <div class="bg-gray-900/95 backdrop-blur-xl border border-cyan-500 rounded-2xl p-8 w-96 shadow-[0_0_60px_rgba(8,145,178,0.5)] pointer-events-auto transform scale-90 transition-all duration-500" id="confirm-card-inner">
+            <div class="flex items-center gap-3 mb-6">
+                <div class="w-12 h-12 rounded-full bg-green-500/20 border-2 border-green-400 flex items-center justify-center">
+                    <svg class="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                </div>
+                <div>
+                    <h3 class="text-white font-bold text-lg">Appointment Confirmed!</h3>
+                    <p class="text-green-400 text-xs font-mono tracking-wider">NODE SECURED</p>
+                </div>
+            </div>
+            <div class="h-px bg-gradient-to-r from-cyan-500 to-transparent mb-6"></div>
+            <div class="space-y-3 mb-6">
+                <div class="flex justify-between"><span class="text-gray-400 text-sm">Doctor</span><span class="text-white font-semibold text-sm" id="card-doctor">—</span></div>
+                <div class="flex justify-between"><span class="text-gray-400 text-sm">Hospital</span><span class="text-cyan-300 text-sm" id="card-hospital">—</span></div>
+                <div class="flex justify-between"><span class="text-gray-400 text-sm">Date</span><span class="text-white text-sm" id="card-date">—</span></div>
+                <div class="flex justify-between"><span class="text-gray-400 text-sm">Time</span><span class="text-white text-sm" id="card-time">—</span></div>
+                <div class="flex justify-between"><span class="text-gray-400 text-sm">Patient</span><span class="text-white text-sm" id="card-patient">Emma (Demo)</span></div>
+            </div>
+            <div class="bg-cyan-900/40 border border-cyan-700 rounded-xl p-4 text-center mb-6">
+                <p class="text-gray-400 text-xs mb-1 tracking-widest uppercase">Booking Token</p>
+                <p class="text-cyan-300 font-mono font-bold text-xl tracking-widest" id="card-token">—</p>
+            </div>
+            <p class="text-center text-xs mb-4" id="card-email-status">📧 Sending confirmation email...</p>
+            <button onclick="document.getElementById('booking-confirm-card').style.opacity='0';document.getElementById('booking-confirm-card').style.pointerEvents='none';" 
+                class="w-full bg-cyan-900/50 hover:bg-cyan-800 border border-cyan-700 text-white text-xs font-bold py-2.5 rounded-lg transition-colors tracking-widest uppercase">
+                Close
+            </button>
+        </div>
+    </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+    <script src="js/maps.js"></script>
+</body>
+</html>

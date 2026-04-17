@@ -1,0 +1,38 @@
+AI Clinic Dependencies Overview
+=============================
+
+This document outlines the core dependencies used in the AI Clinic application and the rationale for their inclusion.
+
+Backend Dependencies (Python)
+-----------------------------
+1. Flask
+   - Purpose: The core web framework. 
+   - Rationale: Provides the lightweight server architecture needed to handle API routing (booking, cancellation, history) and serve the frontend assets.
+
+2. Flask-CORS
+   - Purpose: Cross-Origin Resource Sharing.
+   - Rationale: Essential for allowing the frontend (browser) to make secure asynchronous requests to the Flask backend, especially during development or when hosted on different ports.
+
+3. Google-GenerativeAI
+   - Purpose: Gemini LLM Integration.
+   - Rationale: Powers Doc Emma's personality and complex Natural Language Understanding (NLU). It allows the AI to handle nuanced user queries that go beyond basic keyword matching.
+
+Frontend Dependencies (Web)
+---------------------------
+1. Tailwind CSS (via CDN)
+   - Purpose: Design and Layout.
+   - Rationale: Used for fast, consistent styling and responsive layouts (e.g., the tri-column dashboard and glassy cards).
+
+2. Google Fonts (Outfit)
+   - Purpose: Typography.
+   - Rationale: Provides a clean, professional, and modern medical aesthetic that matches the "Airy Light" theme.
+
+3. Web Speech API (Browser Native)
+   - Purpose: Voice Interaction.
+   - Rationale: Utilized for real-time Speech-to-Text (SpeechRecognition) and Speech Synthesis (SpeechSynthesisUtterance) to enable the "Doc Emma" voice interface without requiring external paid speech APIs.
+
+Database
+--------
+1. SQLite
+   - Purpose: Data Persistence.
+   - Rationale: A serverless, lightweight database used to store appointment history and specialist data (clinic.db).

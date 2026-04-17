@@ -1,0 +1,266 @@
+/* DecVoice AI - Professional Light Theme Aesthetic */
+
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+
+:root {
+    --bg-light: #F5F3EC;
+    --bg-accent: #FFFFFF;
+    --primary: #3B82F6;
+    --secondary: #60a5fa;
+    --text-main: #1F2937;
+    --text-muted: #6B7280;
+    --glass: #FFFFFF;
+    --glass-border: rgba(0, 0, 0, 0.03);
+    --success: #10B981;
+    --error: #EF4444;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Outfit', sans-serif;
+    background-color: var(--bg-light);
+    color: var(--text-main);
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* Glass & Acrylic Components */
+.glass-panel {
+    background: var(--glass);
+    border: 1px solid var(--glass-border);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+}
+
+.acrylic-sidebar {
+    background: rgba(255, 255, 255, 0.4);
+    backdrop-filter: blur(30px);
+}
+
+/* High-Visibility Scrollbar Refinement */
+.custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 10px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
+    border: 2px solid #f1f5f9;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+#system-log {
+    background: rgba(255, 255, 255, 0.6);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    color: #334155;
+    padding-right: 12px;
+}
+
+/* Specialist Grid Cards */
+.specialist-card {
+    background: #FFFFFF;
+    border: 1px solid rgba(0, 0, 0, 0.03);
+    border-radius: 1.5rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+}
+.specialist-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.1);
+}
+.specialist-card.selected {
+    border: 2px solid var(--primary);
+    background: #FFFFFF;
+    box-shadow: 0 10px 40px -10px rgba(59, 130, 246, 0.2);
+}
+
+/* Calendar Styling */
+.calendar-day {
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.75rem;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: 0.2s;
+    color: var(--text-main);
+}
+.calendar-day:hover:not(.empty) {
+    background: rgba(59, 130, 246, 0.05);
+}
+.calendar-day.today {
+    color: var(--primary);
+    background: rgba(59, 130, 246, 0.1);
+    font-weight: 700;
+}
+.calendar-day.selected {
+    background: var(--primary) !important;
+    color: white !important;
+}
+
+/* Language Selector */
+.lang-btn {
+    padding: 0.4rem 0.8rem;
+    border-radius: 0.75rem;
+    font-size: 0.7rem;
+    font-weight: 800;
+    transition: all 0.3s;
+    background: white;
+    border: 1px solid #f1f5f9;
+    color: #94a3b8;
+    cursor: pointer;
+}
+.lang-btn:hover {
+    border-color: #3b82f6;
+    color: #3b82f6;
+    background: #eff6ff;
+}
+.lang-btn.active {
+    background: #3b82f6;
+    color: white;
+    border-color: #3b82f6;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+}
+
+/* Time Slots */
+.slot-grid-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 0.5rem;
+}
+.slot-item {
+    background: white;
+    border: 1.5px solid rgba(37, 99, 235, 0.12);
+    border-radius: 0.75rem;
+    padding: 0.6rem;
+    text-align: center;
+    font-size: 0.75rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: var(--text-muted);
+}
+.slot-item:hover {
+    background: rgba(37, 99, 235, 0.08);
+    border-color: var(--primary);
+    color: var(--primary);
+}
+.slot-item.selected {
+    background: var(--primary);
+    color: white !important;
+    border-color: var(--primary);
+    box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
+}
+.slot-item.booked {
+    opacity: 0.4;
+    pointer-events: none;
+    text-decoration: line-through;
+    background: #f1f5f9;
+}
+
+/* Magical Glowing Ball Effect */
+.magical-ball {
+    position: absolute;
+    width: 80px;
+    height: 80px;
+    background: radial-gradient(circle, rgba(59, 130, 246, 0.4) 0%, transparent 70%);
+    filter: blur(8px);
+    border-radius: 50%;
+    z-index: 20;
+    pointer-events: none;
+    animation: ball-drift 4s ease-in-out infinite;
+}
+
+@keyframes ball-drift {
+    0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.7; }
+    50% { transform: translate(10px, -15px) scale(1.1); opacity: 0.9; }
+}
+
+#ai-core-ball {
+    transition: all 0.5s ease;
+}
+
+#ai-core-ball.listening { background: radial-gradient(circle, rgba(37, 99, 235, 0.5) 0%, transparent 70%); filter: blur(12px); }
+#ai-core-ball.thinking { background: radial-gradient(circle, rgba(236, 72, 153, 0.5) 0%, transparent 70%); filter: blur(20px); }
+#ai-core-ball.working { background: radial-gradient(circle, rgba(16, 185, 129, 0.5) 0%, transparent 70%); filter: blur(10px); }
+
+/* Modals */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.2);
+    backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.3s;
+}
+.modal-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+.modal-content {
+    background: white;
+    width: 90%;
+    max-width: 800px;
+    max-height: 80vh;
+    border-radius: 2rem;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
+    padding: 2.5rem;
+    overflow-y: auto;
+    transform: translateY(20px);
+    transition: all 0.3s;
+}
+.modal-overlay.active .modal-content {
+    transform: translateY(0);
+}
+
+/* Nav Links */
+.nav-link {
+    transition: all 0.3s;
+    color: var(--text-muted);
+    font-weight: 600;
+    position: relative;
+    padding-bottom: 4px;
+}
+.nav-link:hover, .nav-link.active {
+    color: var(--primary);
+}
+.nav-link.active::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: var(--primary);
+    border-radius: 2px;
+}
+
+/* AI Wave Visualizer */
+.wave-bar {
+    width: 3px;
+    background: var(--primary);
+    border-radius: 2px;
+    margin: 0 1px;
+}
+
+/* Cursor */
+#ai-cursor {
+    border-color: var(--primary);
+    box-shadow: 0 0 15px rgba(59, 130, 246, 0.4);
+}
